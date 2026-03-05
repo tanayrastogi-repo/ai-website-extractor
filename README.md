@@ -1,42 +1,45 @@
-# AI Website Extractor 🕵️‍♂️
+# 🕵️‍♂️ AI Job Scraper
+   
+An AI-powered tool that transforms messy job posting URLs into clean, structured Markdown files. It uses LLMs to intelligently parse responsibilities, qualifications, and skills from any careers page.
 
-An LLM-powered tool for extracting structured data from websites and formatting it into customizable Markdown templates.
+### Features
+* **Multi-Model Support:** Choose between Google **Gemini** (Fast/Pro) or local **Ollama** models .
 
-## Overview
-This project uses **Google Gemini 2.5 Flash** to analyze raw website content, extract key information (such as job postings), and render it through a flexible templating system. It features an interactive UI built with **Marimo**.
+* **Custom Templates:** Use Jinja2-style templates to define exactly how your Markdown should be formatted.
 
-## Features
-- **Intelligent Extraction:** Uses Gemini to identify and structure data from messy HTML.
-- **Interactive UI:** A real-time web interface for inputting URLs and editing templates.
-- **Customizable Formatting:** Support for Jinja2-based Markdown templates to control output structure.
-- **Automated Scraping:** Built-in HTML fetching and cleaning pipeline.
+* **Interactive UI:** Built with [Marimo](https://marimo.io/) for a reactive, notebook-like experience.
+
+
+### 🛠️ Tech Stack
+- **Interactive UI & Reactive Runner:** marimo
+- **LLM Orchestration & Structured Output:** langchain
+- **Google Gemini Model Integration:** langchain-google-genai
+- **Local Ollama Model Integration:** langchain-ollama
+- **Structured Data Modeling & Validation:** pydantic
+- **HTML Scraping & HTTP Requests:** httpx
+- **HTML Parsing & Text Cleaning:** beautifulsoup4
+- **Markdown Templating Engine:** jinja2
+- **Environment Variable Management:** python-dotenv
+- **Automated Testing Framework:** pytest
+- **Local Model Discovery:** ollama
+
 
 ## Getting Started
 
-### Prerequisites
-- Python 3.12 or higher.
-- A Google Gemini API key.
+### 1. Prerequisites
+- Python 3.12+
+- [uv](https://github.com/astral-sh/uv) (recommended)
+- (Optional) [Ollama](https://ollama.com/) for local extraction.
 
-### Installation
-1. Clone the repository.
-2. Install dependencies using [uv](https://github.com/astral-sh/uv):
-   ```bash
-   uv sync
-   ```
-3. Create a `.env` file in the root directory and add your API key:
-   ```env
-   GOOGLE_API_KEY=your_api_key_here
-   ```
+### 2. Installation
+git clone https://github.com/your-repo/ai-website-extractor.git
+cd ai-website-extractor
+uv sync
 
-### Usage
-Run the interactive application:
-```bash
-uv run marimo run app.py
-```
-Open the provided URL in your browser to start extracting data.
+### 3. Configuration
+Create a `.env` file in the root directory:
+GOOGLE_API_KEY=your_gemini_api_key_here
 
-## Project Structure
-- `app.py`: The main Marimo interactive application.
-- `src/`: Core logic including scraping, extraction (LLM), and formatting.
-- `extractions/`: Default directory where generated Markdown files are saved.
-- `tests/`: Automated test suite.
+### 4. Run the App
+uv run marimo edit app.py
+

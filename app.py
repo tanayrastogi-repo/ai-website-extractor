@@ -1,7 +1,7 @@
 import marimo
 
 __generated_with = "0.20.4"
-app = marimo.App()
+app = marimo.App(width="full")
 
 
 @app.cell
@@ -31,9 +31,42 @@ def _():
 
 @app.cell
 def _(mo):
+    mo.md(r"""# 🕵️‍♂️ AI Job Scraper""").center()
+    return
+
+
+@app.cell
+def _(mo):
     mo.md("""
-    # 🕵️‍♂️ AI Job Scraper
+    Automatically extract structured data from job postings using AI. This tool parses URLs to identify key responsibilities, qualifications, and technical requirements, saving them as clean Markdown files.
+
+    ---
     """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo, model_select, provider_select, url_input):
+    mo.vstack(
+        [
+            mo.md(r"""## CONFIGURATION""").center(), 
+            mo.md(r"""* **URL**"""), 
+            url_input,
+            mo.md(r"""* **AI-Model**"""), 
+            mo.hstack([provider_select, model_select], justify="start"), 
+        ], justify="center")
+    return
+
+
+@app.cell
+def _(template_editor):
+    template_editor
+    return
+
+
+@app.cell
+def _(extract_button):
+    extract_button.center()
     return
 
 
@@ -42,8 +75,9 @@ def _(mo):
     url_input = mo.ui.text(
         label="Job Description URL",
         placeholder="https://careers.google.com/jobs/results/...",
+        kind="url",
     )
-    extract_button = mo.ui.run_button(label="Extract Information")
+    extract_button = mo.ui.run_button(label="Extract Information", full_width=True)
 
     # LLM Provider Selection
     provider_select = mo.ui.dropdown(
@@ -80,55 +114,47 @@ def _(mo, ollama_models, provider_select):
 @app.cell
 def _(mo):
     _default_template = """# {{ job_title }} - {{ company_name }}
+
     ## Overview
     - **Location:** {{ location }}
     - **Contact:** {{ contact_person if contact_person else 'N/A' }}
 
-    ### About the Company
+    ## About the Company
     {{ about_company }}
 
-    ### Role Details
-    #### Key Responsibilities
+    ## Role Details
+
+    ### Key Responsibilities
     {{ key_responsibilities }}
 
-    #### Qualifications
+    ### Qualifications
     {% for qual in qualifications -%}
     - {{ qual }}
     {% endfor %}
 
-    #### Requirements
+    ### Requirements
+
     ##### Technical Skills
     {% for tech in technical_skills -%}
     - {{ tech }}
     {% endfor %}
 
-    ##### Soft Skills
+    #### Soft Skills
     {% for soft in soft_skills -%}
     - {{ soft }}
     {% endfor %}
     """
     template_editor = mo.ui.text_area(
-        value=_default_template, label="Markdown Template", full_width=True
+        value=_default_template, label="Output Template", full_width=True
     )
     return (template_editor,)
 
 
-@app.cell
-def _(
-    extract_button,
-    mo,
-    model_select,
-    provider_select,
-    template_editor,
-    url_input,
-):
-    mo.vstack(
-        [
-            mo.hstack([url_input, extract_button], justify="start"),
-            mo.hstack([provider_select, model_select], justify="start"),
-            template_editor,
-        ]
-    )
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ---
+    """)
     return
 
 
@@ -170,9 +196,9 @@ def _(
 
             bar.update(subtitle="Done!")
 
-            result_view = mo.md(f"### Extraction Complete! \nSaved to `{filename}`\n\n--- \n{markdown_content}")
+            result_view = mo.md(f"### Extraction Complete! \nSaved to `{filename}\n\n--- \n{markdown_content}").callout(kind="success")
         except Exception as e:
-            result_view = mo.md(f"❌ **Error:** {str(e)}")
+            result_view = mo.md(f"❌ **Error:** {str(e)}").callout(kind="danger")
 
     result_view
     return
