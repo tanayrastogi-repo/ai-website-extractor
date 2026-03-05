@@ -11,12 +11,19 @@ def _():
     from src.extraction import extract_job_data
     from src.formatter import render_markdown, save_markdown
     import os
+    import ollama
 
+    # Dynamic Model Discovery for Ollama
+    try:
+        ollama_models = [m.model for m in ollama.list().models]
+    except Exception:
+        ollama_models = []
     return (
         extract_clean_text,
         extract_job_data,
         fetch_html,
         mo,
+        ollama_models,
         render_markdown,
         save_markdown,
     )
@@ -32,10 +39,47 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    url_input = mo.ui.text(label="Job Description URL", placeholder="https://careers.google.com/jobs/results/...")
+    url_input = mo.ui.text(
+        label="Job Description URL",
+        placeholder="https://careers.google.com/jobs/results/...",
+    )
     extract_button = mo.ui.run_button(label="Extract Information")
 
-    default_template = """# {{ job_title }} - {{ company_name }}
+    # LLM Provider Selection
+    provider_select = mo.ui.dropdown(
+        options=["Gemini", "Ollama"], value="Gemini", label="LLM Provider"
+    )
+    return extract_button, provider_select, url_input
+
+
+@app.cell
+def _(mo, ollama_models, provider_select):
+    # Dynamic Model Selection
+    gemini_models = ["gemini-2.5-flash", "gemini-2.0-pro-exp"]
+    default_ollama = "gemma3:1b"
+
+    # Ensure default_ollama is in the list if available
+    available_ollama = ollama_models if ollama_models else ["No local models found"]
+
+    _model_options = (
+        gemini_models if provider_select.value == "Gemini" else available_ollama
+    )
+
+    _initial_model = (
+        "gemini-2.5-flash"
+        if provider_select.value == "Gemini"
+        else (default_ollama if default_ollama in available_ollama else available_ollama[0])
+    )
+
+    model_select = mo.ui.dropdown(
+        options=_model_options, value=_initial_model, label="Model Selection"
+    )
+    return (model_select,)
+
+
+@app.cell
+def _(mo):
+    _default_template = """# {{ job_title }} - {{ company_name }}
     ## Overview
     - **Location:** {{ location }}
     - **Contact:** {{ contact_person if contact_person else 'N/A' }}
@@ -63,10 +107,29 @@ def _(mo):
     - {{ soft }}
     {% endfor %}
     """
-    template_editor = mo.ui.text_area(value=default_template, label="Markdown Template", full_width=True)
+    template_editor = mo.ui.text_area(
+        value=_default_template, label="Markdown Template", full_width=True
+    )
+    return (template_editor,)
 
-    mo.hstack([url_input, extract_button], justify="start")
-    return extract_button, template_editor, url_input
+
+@app.cell
+def _(
+    extract_button,
+    mo,
+    model_select,
+    provider_select,
+    template_editor,
+    url_input,
+):
+    mo.vstack(
+        [
+            mo.hstack([url_input, extract_button], justify="start"),
+            mo.hstack([provider_select, model_select], justify="start"),
+            template_editor,
+        ]
+    )
+    return
 
 
 @app.cell
@@ -76,6 +139,8 @@ def _(
     extract_job_data,
     fetch_html,
     mo,
+    model_select,
+    provider_select,
     render_markdown,
     save_markdown,
     template_editor,
@@ -88,10 +153,10 @@ def _(
             # Step 1: Fetch and Clean
             html = fetch_html(url_input.value)
             clean_text = extract_clean_text(html)
-            bar.update(subtitle="AI Extraction (Gemini)...")
+            bar.update(subtitle=f"AI Extraction ({provider_select.value}: {model_select.value})...")
 
             # Step 2: AI Extraction
-            job_info = extract_job_data(clean_text)
+            job_info = extract_job_data(clean_text, provider=provider_select.value, model=model_select.value)
             bar.update(subtitle="Formatting Markdown...")
 
             # Step 3: Render and Save
