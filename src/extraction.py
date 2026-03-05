@@ -18,7 +18,7 @@ def extract_job_data(text: str) -> JobInfo:
     structured_llm = llm.with_structured_output(JobInfo)
     
     prompt = ChatPromptTemplate.from_messages([
-        ("system", "You are an expert at extracting structured information from job postings."),
+        ("system", "You are an expert at extracting structured information from job postings. Break down qualifications and requirements into clear, concise bullet points. Specifically, categorize requirements into 'technical_skills' (tools, languages, domain knowledge) and 'soft_skills' (communication, teamwork, interpersonal)."),
         ("human", "Extract the job information from the following text: {text}")
     ])
     

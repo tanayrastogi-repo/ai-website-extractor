@@ -48,10 +48,20 @@ def _(mo):
     {{ key_responsibilities }}
 
     #### Qualifications
-    {{ qualifications }}
+    {% for qual in qualifications -%}
+    - {{ qual }}
+    {% endfor %}
 
     #### Requirements
-    {{ requirements }}
+    ##### Technical Skills
+    {% for tech in technical_skills -%}
+    - {{ tech }}
+    {% endfor %}
+
+    ##### Soft Skills
+    {% for soft in soft_skills -%}
+    - {{ soft }}
+    {% endfor %}
     """
     template_editor = mo.ui.text_area(value=default_template, label="Markdown Template", full_width=True)
 

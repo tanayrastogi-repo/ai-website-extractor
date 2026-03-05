@@ -12,8 +12,14 @@ def fetch_html(url: str) -> str:
     return response.text
 
 def extract_clean_text(html: str) -> str:
-    """Extracts clean text from HTML by removing scripts and styles."""
+    """Extracts clean text from HTML by removing scripts and styles, but preserving JSON-LD."""
     soup = BeautifulSoup(html, "html.parser")
+    
+    # Extract JSON-LD content as it often contains the job description in SPAs
+    json_ld_content = []
+    for script in soup.find_all("script", type="application/ld+json"):
+        if script.string:
+            json_ld_content.append(script.string.strip())
     
     # Remove script and style elements
     for script_or_style in soup(["script", "style"]):
@@ -21,6 +27,11 @@ def extract_clean_text(html: str) -> str:
     
     # Get text and clean up whitespace
     text = soup.get_text(separator=" ")
+    
+    # Append JSON-LD content to the text
+    if json_ld_content:
+        text += "\n\n" + "\n".join(json_ld_content)
+    
     lines = (line.strip() for line in text.splitlines())
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
     clean_text = "\n".join(chunk for chunk in chunks if chunk)

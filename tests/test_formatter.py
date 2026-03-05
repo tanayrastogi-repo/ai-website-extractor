@@ -10,16 +10,18 @@ def test_render_markdown():
         location="Mountain View",
         about_company="Tech giant",
         key_responsibilities="Coding",
-        qualifications="Degree",
-        requirements="Python",
+        qualifications=["Degree"],
+        technical_skills=["Python"],
+        soft_skills=["Teamwork"],
         contact_person="HR"
     )
     
-    template = "# {{ job_title }} at {{ company_name }}\nLocation: {{ location }}"
+    template = "# {{ job_title }} at {{ company_name }}\nQualifications: {{ qualifications[0] }}\nTech Skills: {{ technical_skills[0] }}"
     rendered = render_markdown(job_info, template)
     
     assert "# Software Engineer at Google" in rendered
-    assert "Location: Mountain View" in rendered
+    assert "Qualifications: Degree" in rendered
+    assert "Tech Skills: Python" in rendered
 
 def test_save_markdown(tmp_path):
     content = "# Test Job"

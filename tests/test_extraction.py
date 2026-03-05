@@ -14,8 +14,9 @@ def test_extract_job_data():
         location="Mountain View, CA",
         about_company="Search engine company",
         key_responsibilities="Code in Python",
-        qualifications="CS degree",
-        requirements="Python knowledge",
+        qualifications=["CS degree"],
+        technical_skills=["Python", "Algorithms"],
+        soft_skills=["Teamwork"],
         contact_person=None
     )
     
