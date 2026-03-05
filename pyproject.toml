@@ -1,0 +1,17 @@
+[project]
+name = "ai-website-extractor"
+version = "0.1.0"
+description = "LLM-powered extraction of structured data from websites."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "beautifulsoup4>=4.14.3",
+    "httpx>=0.28.1",
+    "jinja2>=3.1.6",
+    "langchain>=1.2.10",
+    "langchain-google-genai>=4.2.1",
+    "marimo[recommended]>=0.20.4",
+    "pydantic>=2.12.5",
+    "pytest>=9.0.2",
+    "python-dotenv>=1.2.2",
+]

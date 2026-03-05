@@ -1,0 +1,29 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Envionment variables
+.env
+
+# Marimo notebooks cache
+__marimo__/
+
+# Pytest cache
+.pytest_cache/
+
+# Extractions from Marimo notebooks
+extractions/
+
+# Gemini files
+*.gemini
+
+# Openspec files
+openspec
+
